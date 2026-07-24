@@ -29,7 +29,7 @@ const dict = {
   // actions/reloadPrometheusConfig.ts
   'Reload Prometheus Config': 300,
   'Reload the Prometheus configuration.': 301,
-  'Success': 302,
+  Success: 302,
   'Prometheus configuration reloaded successfully.': 303,
   'Prometheus is not running, no action taken.': 304,
 

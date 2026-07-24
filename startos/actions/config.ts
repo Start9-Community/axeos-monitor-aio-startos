@@ -12,7 +12,9 @@ export const inputSpec = InputSpec.of({
     List.text(
       {
         name: i18n('Bitaxe IP Addresses'),
-        description: i18n('IP address of each AxeOS/Bitaxe instance to monitor.'),
+        description: i18n(
+          'IP address of each AxeOS/Bitaxe instance to monitor.',
+        ),
         minLength: 1,
       },
       {
@@ -20,8 +22,11 @@ export const inputSpec = InputSpec.of({
         inputmode: 'url',
         patterns: [
           {
-            regex: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-            description: i18n('Must be a valid IPv4 address (e.g. 192.168.1.100)'),
+            regex:
+              '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+            description: i18n(
+              'Must be a valid IPv4 address (e.g. 192.168.1.100)',
+            ),
           },
         ],
       },
@@ -35,7 +40,9 @@ export const inputSpec = InputSpec.of({
   }),
   scrape_interval: Value.number({
     name: i18n('Scrape Interval'),
-    description: i18n('How often to scrape for metrics. Default is 15 seconds.'),
+    description: i18n(
+      'How often to scrape for metrics. Default is 15 seconds.',
+    ),
     required: true,
     default: 15,
     integer: true,

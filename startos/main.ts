@@ -10,7 +10,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const axeosVersion =
     (await store.read().const(effects))?.axeosVersion ?? '2.11'
 
-  const grafanaSubcontainer = await sdk.SubContainer.of(
+  const grafanaSubcontainer = await sdk.SubContainer.eager(
     effects,
     {
       imageId: 'grafana',
@@ -45,7 +45,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     'grafana',
   )
 
-  const prometheusSubcontainer = await sdk.SubContainer.of(
+  const prometheusSubcontainer = await sdk.SubContainer.eager(
     effects,
     {
       imageId: 'prometheus',
@@ -68,7 +68,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     'prometheus',
   )
 
-  const jsonExporterSubcontainer = await sdk.SubContainer.of(
+  const jsonExporterSubcontainer = await sdk.SubContainer.eager(
     effects,
     {
       imageId: 'json-exporter',
@@ -178,14 +178,10 @@ export const main = sdk.setupMain(async ({ effects }) => {
         // The function below determines the health status of the daemon.
         gracePeriod: 60000,
         fn: () =>
-          sdk.healthCheck.checkWebUrl(
-            effects,
-            'http://axeos-monitor-aio.startos:' + uiPort,
-            {
-              successMessage: i18n('Grafana is ready'),
-              errorMessage: i18n('Grafana is unreachable'),
-            },
-          ),
+          sdk.healthCheck.checkWebUrl(effects, 'http://127.0.0.1:' + uiPort, {
+            successMessage: i18n('Grafana is ready'),
+            errorMessage: i18n('Grafana is unreachable'),
+          }),
       },
       requires: ['prometheus', 'json-exporter'],
     })
