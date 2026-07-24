@@ -4,13 +4,15 @@ AxeOS Monitor bundles Grafana, Prometheus, and JSON Exporter into a single servi
 
 ## First-time setup
 
-1. Open the **Configure** action and enter the IP addresses of your Bitaxe miners (one per entry), select your AxeOS version, and save.
+1. Open **Configure AxeOS Monitor** and enter the IP addresses of your Bitaxe miners (one per entry), select your AxeOS version, and save.
 2. The service will start collecting metrics immediately.
 3. Open the **Grafana Dashboard** interface. You will be prompted to create an account on first visit.
 
 ## Adding or removing miners
 
-Run the **Configure** action at any time to add or remove IP addresses. Changes take effect immediately without restarting.
+Run **Configure AxeOS Monitor** at any time to add or remove IP addresses. Changes take effect immediately without restarting.
+
+If you create a Grafana admin account and forget its password, use **Reset Admin Password**.
 
 ## Customize the default Dashboard
 

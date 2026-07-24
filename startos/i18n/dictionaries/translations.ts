@@ -144,7 +144,7 @@ export default {
 
     // actions/config.ts
     200: 'Adresses IP Bitaxe',
-    201: "Adresse IP de chaque instance AxeOS/Bitaxe à surveiller.",
+    201: 'Adresse IP de chaque instance AxeOS/Bitaxe à surveiller.',
     208: 'Doit être une adresse IPv4 valide (ex. 192.168.1.100)',
     202: 'Version AxeOS (ESP-Miner)',
     203: "La version d'AxeOS (ESP-Miner) que vous utilisez.",
@@ -164,9 +164,9 @@ export default {
     400: 'Nouveau mot de passe administrateur',
     401: "Le nouveau mot de passe pour l'utilisateur administrateur Grafana. Minimum 4 caractères.",
     402: 'Le mot de passe doit comporter au moins 4 caractères',
-    403: "Réinitialiser le mot de passe administrateur",
+    403: 'Réinitialiser le mot de passe administrateur',
     404: "Réinitialise le mot de passe de l'utilisateur administrateur Grafana. Prend effet immédiatement.",
     405: "Cela écrasera immédiatement le mot de passe actuel de l'administrateur Grafana.",
-    406: "Le mot de passe administrateur Grafana a été réinitialisé avec succès.",
+    406: 'Le mot de passe administrateur Grafana a été réinitialisé avec succès.',
   },
 } satisfies Record<string, LangDict>
