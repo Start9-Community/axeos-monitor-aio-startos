@@ -6,7 +6,7 @@ import {
 } from '../versions'
 
 export const manifest = setupManifest({
-  id: 'axeos-monitor-aio',  
+  id: 'axeos-monitor-aio',
   title: 'AxeOS Monitor',
   license: 'MIT',
   packageRepo: 'https://github.com/remcoros/axeos-monitor-aio-startos',
