@@ -1,5 +1,5 @@
-import { sdk } from '../sdk'
 import { i18n } from '../i18n'
+import { sdk } from '../sdk'
 
 const { InputSpec, Value } = sdk
 
@@ -35,7 +35,7 @@ export const resetGrafanaAdminPassword = sdk.Action.withInput(
       'This will immediately overwrite the current Grafana admin password.',
     ),
     allowedStatuses: 'any',
-    group: 'Maintenance',
+    group: null,
     visibility: 'enabled',
   }),
 
@@ -52,7 +52,7 @@ export const resetGrafanaAdminPassword = sdk.Action.withInput(
       { imageId: 'grafana' },
       sdk.Mounts.of().mountVolume({
         volumeId: 'grafana',
-        subpath: '/var/lib/grafana',
+        subpath: 'var/lib/grafana',
         mountpoint: '/var/lib/grafana',
         readonly: false,
         type: 'directory',
@@ -74,7 +74,29 @@ export const resetGrafanaAdminPassword = sdk.Action.withInput(
       version: '1',
       title: i18n('Success'),
       message: i18n('Grafana admin password has been reset successfully.'),
-      result: null,
+      result: {
+        type: 'group',
+        value: [
+          {
+            type: 'single',
+            name: i18n('Username'),
+            description: null,
+            value: 'admin',
+            masked: false,
+            copyable: true,
+            qr: false,
+          },
+          {
+            type: 'single',
+            name: i18n('Password'),
+            description: null,
+            value: input.newPassword,
+            masked: true,
+            copyable: true,
+            qr: false,
+          },
+        ],
+      },
     }
   },
 )

@@ -1,9 +1,14 @@
-import { axeosConfig } from '../fileModels/axeos.yml'
-import { sdk } from '../sdk'
 import { T } from '@start9labs/start-sdk'
-import { reloadPrometheusConfig } from './reloadPrometheusConfig'
+import { axeosConfig } from '../fileModels/axeos.yml'
 import { store } from '../fileModels/store.json'
 import { i18n } from '../i18n'
+import { sdk } from '../sdk'
+import { jsonExporterPort } from '../utils'
+import {
+  isPrometheusRunning,
+  reloadOutcomeMessage,
+  reloadPrometheus,
+} from './reloadPrometheusConfig'
 
 const { InputSpec, Value, List } = sdk
 
@@ -46,6 +51,7 @@ export const inputSpec = InputSpec.of({
     required: true,
     default: 15,
     integer: true,
+    min: 1,
     units: 'seconds',
     step: 1,
   }),
@@ -64,7 +70,7 @@ export const config = sdk.Action.withInput(
     description: i18n('Configure AxeOS Monitor settings'),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Configuration',
+    group: null,
     visibility: 'enabled',
   }),
 
@@ -72,34 +78,31 @@ export const config = sdk.Action.withInput(
   inputSpec,
 
   // optionally pre-fill the input form
-  async ({ effects }) => readSettings(effects),
+  async ({ effects }) => readSettings(),
 
   // the execution function
   ({ effects, input }) => writeSettings(effects, input),
 )
 
-async function readSettings(effects: T.Effects): Promise<PartialInputSpec> {
+async function readSettings(): Promise<PartialInputSpec> {
   const conf = await axeosConfig.read().once()
-  const ip_addresses =
-    conf?.scrape_configs[0]?.static_configs[0]?.targets.map((target) =>
-      target.replace('http://', '').replace('/api/system/info', ''),
-    ) ?? []
-
-  const storeData = await store.read().once()
-  const axeosVersion = storeData?.axeosVersion as InputSpec['axeosVersion']
 
   return {
-    ip_addresses,
-    axeosVersion,
+    ip_addresses:
+      conf?.scrape_configs[0]?.static_configs[0]?.targets.map((target) =>
+        target.replace('http://', '').replace('/api/system/info', ''),
+      ) ?? [],
+    axeosVersion: (await store.read().once())?.axeosVersion,
     scrape_interval: parseInt(
       conf?.scrape_configs[0]?.scrape_interval?.replace('s', '') ?? '15',
     ),
   }
 }
 
-async function writeSettings(effects: T.Effects, input: InputSpec) {
-  const targets = input.ip_addresses.map((ip) => `http://${ip}/api/system/info`)
-
+async function writeSettings(
+  effects: T.Effects,
+  input: InputSpec,
+): Promise<T.ActionResult & { version: '1' }> {
   await axeosConfig.write(effects, {
     scrape_configs: [
       {
@@ -109,32 +112,50 @@ async function writeSettings(effects: T.Effects, input: InputSpec) {
         params: { module: ['axeos'] },
         static_configs: [
           {
-            targets,
+            targets: input.ip_addresses.map(
+              (ip) => `http://${ip}/api/system/info`,
+            ),
           },
         ],
+        // The scrape goes to json-exporter, which fetches the miner named by
+        // __param_target: the last rule rewrites the address after the first
+        // two have copied it into the query parameter and the instance label.
         relabel_configs: [
           { source_labels: ['__address__'], target_label: '__param_target' },
           {
             source_labels: ['__address__'],
-            regex: 'http://([0-9]+(?:\.[0-9]+){3})/.*',
+            regex: 'http://([0-9]+(?:\\.[0-9]+){3})/.*',
             target_label: 'instance',
           },
-          { target_label: '__address__', replacement: '127.0.0.1:7979' },
+          {
+            target_label: '__address__',
+            replacement: `127.0.0.1:${jsonExporterPort}`,
+          },
         ],
       },
     ],
   })
 
-  await reloadPrometheusConfig.run({
-    effects,
-    input: {},
-  })
+  const versionChanged =
+    (await store.read().once())?.axeosVersion !== input.axeosVersion
+  // A stopped service picks everything up when it starts; a running one only
+  // restarts for a version change, because main.ts watches that value.
+  const running = await isPrometheusRunning(effects)
 
-  // only write axeosVersion to store if changed to avoid unnecessary restart
-  const storeData = await store.read().once()
-  if (storeData?.axeosVersion !== input.axeosVersion) {
-    await store.merge(effects, {
-      axeosVersion: input.axeosVersion,
-    })
+  if (versionChanged) {
+    await store.merge(effects, { axeosVersion: input.axeosVersion })
+  }
+
+  return {
+    version: '1',
+    title: i18n('Configuration Saved'),
+    message: !running
+      ? i18n('Start the service to begin collecting metrics.')
+      : versionChanged
+        ? i18n(
+            'The service is restarting to load the dashboard for the selected AxeOS version.',
+          )
+        : reloadOutcomeMessage(await reloadPrometheus(effects)),
+    result: null,
   }
 }

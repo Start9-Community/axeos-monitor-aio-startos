@@ -2,196 +2,196 @@ modules:
   axeos:
     metrics:
       - name: axe_power
-        path: "{.power}"
+        path: '{.power}'
         type: value
         help: Power in W
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_voltage
-        path: "{.voltage}"
+        path: '{.voltage}'
         type: value
         help: Voltage in mV
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_nominal_voltage
-        path: "{.nominalVoltage}"
+        path: '{.nominalVoltage}'
         type: value
         help: Nominal voltage in V
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_asic_core_voltage_setting
-        path: "{.coreVoltage}"
+        path: '{.coreVoltage}'
         type: value
         help: Core voltage setting in mV
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_asic_core_voltage
-        path: "{.coreVoltageActual}"
+        path: '{.coreVoltageActual}'
         type: value
         help: Actual Core voltage in mV
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_current
-        path: "{.current}"
+        path: '{.current}'
         type: value
         help: Current in mA
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_fan_speed_rpm
-        path: "{.fanrpm}"
+        path: '{.fanrpm}'
         type: value
         help: Fan speed in RPM
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_fan_speed_percent
-        path: "{.fanspeed}"
+        path: '{.fanspeed}'
         type: value
         help: Fan speed in percentage
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_temp
-        path: "{.temp}"
+        path: '{.temp}'
         type: value
         help: Temperature in Celsius
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_hash_rate
-        path: "{.hashRate}"
+        path: '{.hashRate}'
         type: value
         help: Hash rate in GH/s
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_expected_hash_rate
-        path: "{.expectedHashrate}"
+        path: '{.expectedHashrate}'
         type: value
         help: Expected hash rate in GH/s
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_frequency
-        path: "{.frequency}"
+        path: '{.frequency}'
         type: value
         help: ASIC frequency
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_shares_accepted
-        path: "{.sharesAccepted}"
+        path: '{.sharesAccepted}'
         type: value
         help: Shares accepted
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_uptime
-        path: "{.uptimeSeconds}"
+        path: '{.uptimeSeconds}'
         type: value
         help: Uptime in seconds
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_pool_difficulty
-        path: "{.poolDifficulty}"
+        path: '{.poolDifficulty}'
         type: value
         help: Pool difficulty
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_vr_temp
-        path: "{.vrTemp}"
+        path: '{.vrTemp}'
         type: value
         help: Voltage regulator temperature in Celsius
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_free_heap
-        path: "{.freeHeap}"
+        path: '{.freeHeap}'
         type: value
         help: Free heap memory in Bytes
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_overheat_mode
-        path: "{.overheat_mode}"
+        path: '{.overheat_mode}'
         type: value
         help: Overheated?
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_using_fallback_stratum
-        path: "{.isUsingFallbackStratum}"
+        path: '{.isUsingFallbackStratum}'
         type: value
         help: Using fallback stratum?
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_best_difficulty
-        path: "1"
+        path: '1'
         type: value
         help: Best difficulty
         labels:
-          hostname: "{.hostname}"
-          difficulty: "{.bestDiff}"
+          hostname: '{.hostname}'
+          difficulty: '{.bestDiff}'
       - name: axe_best_session_difficulty
-        path: "1"
+        path: '1'
         type: value
         help: Best difficulty since boot
         labels:
-          hostname: "{.hostname}"
-          difficulty: "{.bestSessionDiff}"
+          hostname: '{.hostname}'
+          difficulty: '{.bestSessionDiff}'
       - name: axe_stratum_url
-        path: "1"
+        path: '1'
         type: value
         help: Stratum URL
         labels:
-          hostname: "{.hostname}"
-          stratum_url: "{.stratumURL}"
+          hostname: '{.hostname}'
+          stratum_url: '{.stratumURL}'
       - name: axe_fallback_stratum_url
-        path: "1"
+        path: '1'
         type: value
         help: Stratum URL (fallback)
         labels:
-          hostname: "{.hostname}"
-          stratum_url: "{.fallbackStratumURL}"
+          hostname: '{.hostname}'
+          stratum_url: '{.fallbackStratumURL}'
       - name: axe_wifi_status
-        path: "1"
+        path: '1'
         type: value
         help: WIFI Status
         labels:
-          hostname: "{.hostname}"
-          wifi_status: "{.wifiStatus}"
+          hostname: '{.hostname}'
+          wifi_status: '{.wifiStatus}'
       - name: axe_wifi_rssi
-        path: "{.wifiRSSI}"
+        path: '{.wifiRSSI}'
         type: value
         help: WIFI RSSI in dBm
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_temptarget
-        path: "{.temptarget}"
+        path: '{.temptarget}'
         type: value
         help: Target temperature in Celsius
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_autofanspeed
-        path: "{.autofanspeed}"
+        path: '{.autofanspeed}'
         type: value
         help: Is automatic fan speed enabled
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_overclock_enabled
-        path: "{.overclockEnabled}"
+        path: '{.overclockEnabled}'
         type: value
         help: Is overclock enabled
         labels:
-          hostname: "{.hostname}"
+          hostname: '{.hostname}'
       - name: axe_version
-        path: "1"
+        path: '1'
         type: value
         help: AxeOS version
         labels:
-          hostname: "{.hostname}"
-          wifi_status: "{.version}"
+          hostname: '{.hostname}'
+          wifi_status: '{.version}'
       - name: axe_board_version
-        path: "1"
+        path: '1'
         type: value
         help: Board version
         labels:
-          hostname: "{.hostname}"
-          wifi_status: "{.boardVersion}"
+          hostname: '{.hostname}'
+          wifi_status: '{.boardVersion}'
       - name: axe_asic_model
-        path: "1"
+        path: '1'
         type: value
         help: ASIC model
         labels:
-          hostname: "{.hostname}"
-          wifi_status: "{.ASICModel}"
+          hostname: '{.hostname}'
+          wifi_status: '{.ASICModel}'

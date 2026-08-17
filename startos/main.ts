@@ -1,12 +1,11 @@
 import { store } from './fileModels/store.json'
 import { i18n } from './i18n'
 import { sdk } from './sdk'
-import { uiPort } from './utils'
-import { execSync } from 'child_process'
+import { jsonExporterPort, prometheusPort, uiPort } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
-  console.info('Starting AxeOS Monitor...')
-
+  // Reading with `const` restarts main when the selected version changes, so the
+  // dashboard and exporter module below are re-picked for it.
   const axeosVersion =
     (await store.read().const(effects))?.axeosVersion ?? '2.11'
 
@@ -18,21 +17,21 @@ export const main = sdk.setupMain(async ({ effects }) => {
     sdk.Mounts.of()
       .mountVolume({
         volumeId: 'grafana',
-        subpath: '/var/lib/grafana',
+        subpath: 'var/lib/grafana',
         mountpoint: '/var/lib/grafana',
         readonly: false,
         type: 'directory',
       })
       .mountVolume({
         volumeId: 'grafana',
-        subpath: '/etc/grafana/provisioning',
+        subpath: 'etc/grafana/provisioning',
         mountpoint: '/etc/grafana/provisioning',
         readonly: false,
         type: 'directory',
       })
       .mountVolume({
         volumeId: 'grafana',
-        subpath: '/etc/grafana/dashboards',
+        subpath: 'etc/grafana/dashboards',
         mountpoint: '/etc/grafana/dashboards',
         readonly: false,
         type: 'directory',
@@ -81,54 +80,54 @@ export const main = sdk.setupMain(async ({ effects }) => {
     'json-exporter',
   )
 
-  // Fix file permissions
-  execSync(`chown -R 472:0 ${grafanaSubcontainer.rootfs}/var/lib/grafana`)
-  execSync(`chown -R 472:0 ${grafanaSubcontainer.rootfs}/etc/grafana`)
-
-  execSync(`chown -R nobody:0 ${prometheusSubcontainer.rootfs}/prometheus`)
-  execSync(`chown -R nobody:0 ${prometheusSubcontainer.rootfs}/etc/prometheus`)
-  execSync(`chmod g+w ${prometheusSubcontainer.rootfs}/prometheus`)
-
-  // grafana provisioning
-  const provisioningDir = `${grafanaSubcontainer.rootfs}/etc/grafana/provisioning`
-
-  execSync(
-    `mkdir -p ` +
-      `${provisioningDir}/datasources ` +
-      `${provisioningDir}/dashboards ` +
-      `${provisioningDir}/plugins ` +
-      `${provisioningDir}/alerting`,
-  )
-
-  execSync(
-    `cp -r ${grafanaSubcontainer.rootfs}/assets/provisioning/datasources/* ` +
-      `${provisioningDir}/datasources`,
-  )
-  execSync(
-    `cp -r ${grafanaSubcontainer.rootfs}/assets/provisioning/dashboards/* ` +
-      `${provisioningDir}/dashboards`,
-  )
-  execSync(
-    `cp ${grafanaSubcontainer.rootfs}/assets/dashboards/axeos-${axeosVersion}.json ` +
-      `${grafanaSubcontainer.rootfs}/etc/grafana/dashboards/axeos.json`,
-  )
-
   return sdk.Daemons.of(effects)
+    .addOneshot('grafana-setup', {
+      subcontainer: grafanaSubcontainer,
+      exec: {
+        command: [
+          'sh',
+          '-euc',
+          [
+            'mkdir -p /etc/grafana/provisioning/datasources /etc/grafana/provisioning/dashboards' +
+              ' /etc/grafana/provisioning/plugins /etc/grafana/provisioning/alerting' +
+              ' /etc/grafana/dashboards',
+            'cp -r /assets/provisioning/datasources/. /etc/grafana/provisioning/datasources/',
+            'cp -r /assets/provisioning/dashboards/. /etc/grafana/provisioning/dashboards/',
+            `cp /assets/dashboards/axeos-${axeosVersion}.json /etc/grafana/dashboards/axeos.json`,
+            'chown -R 472:0 /var/lib/grafana /etc/grafana/provisioning /etc/grafana/dashboards',
+          ].join('\n'),
+        ],
+        user: 'root',
+      },
+      requires: [],
+    })
+    .addOneshot('prometheus-setup', {
+      subcontainer: prometheusSubcontainer,
+      exec: {
+        command: [
+          'chown',
+          '-R',
+          'nobody:nobody',
+          '/prometheus',
+          '/etc/prometheus',
+        ],
+        user: 'root',
+      },
+      requires: [],
+    })
     .addDaemon('json-exporter', {
       subcontainer: jsonExporterSubcontainer,
       exec: {
-        command: [
-          '/bin/json_exporter',
+        command: sdk.useEntrypoint([
           `--config.file=/config/config-${axeosVersion}.yml`,
           '--log.level=warn',
-        ],
+        ]),
         runAsInit: true,
-        env: {},
       },
       ready: {
         display: i18n('JSON Exporter'),
         fn: () =>
-          sdk.healthCheck.checkPortListening(effects, 7979, {
+          sdk.healthCheck.checkPortListening(effects, jsonExporterPort, {
             successMessage: i18n('JSON Exporter is ready'),
             errorMessage: i18n('JSON Exporter is unreachable'),
           }),
@@ -138,51 +137,50 @@ export const main = sdk.setupMain(async ({ effects }) => {
     .addDaemon('prometheus', {
       subcontainer: prometheusSubcontainer,
       exec: {
-        command: [
-          '/bin/prometheus',
+        command: sdk.useEntrypoint([
           '--config.file=/etc/prometheus/prometheus.yml',
           '--storage.tsdb.path=/prometheus',
-          '--web.enable-lifecycle', // Enable the /-/reload endpoint
+          // Serves POST /-/reload, which the Configure action calls.
+          '--web.enable-lifecycle',
           '--log.level=warn',
-        ],
+        ]),
         runAsInit: true,
-        env: {},
       },
       ready: {
         display: 'Prometheus',
         fn: () =>
-          sdk.healthCheck.checkPortListening(effects, 9090, {
+          sdk.healthCheck.checkPortListening(effects, prometheusPort, {
             successMessage: i18n('Prometheus is ready'),
             errorMessage: i18n('Prometheus is unreachable'),
           }),
       },
-      requires: ['json-exporter'],
+      requires: ['prometheus-setup', 'json-exporter'],
     })
     .addDaemon('grafana', {
       subcontainer: grafanaSubcontainer,
       exec: {
-        command: ['/run.sh'], // The command to start the daemon.
+        command: sdk.useEntrypoint(),
         runAsInit: true,
         env: {
-          GF_ANALYTICS_REPORTING_ENABLED: 'false', // Disable analytics reporting
-          GF_ANALYTICS_CHECK_FOR_UPDATES: 'false', // Disable update checks
-          GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: 'false', // Disable update checks
-          GF_ANALYTICS_FEEDBACK_LINKS_ENABLED: 'false', // Disable feedback links
+          GF_ANALYTICS_REPORTING_ENABLED: 'false',
+          GF_ANALYTICS_CHECK_FOR_UPDATES: 'false',
+          GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: 'false',
+          GF_ANALYTICS_FEEDBACK_LINKS_ENABLED: 'false',
           GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH:
-            '/etc/grafana/dashboards/axeos.json', // Set the default home dashboard
+            '/etc/grafana/dashboards/axeos.json',
           GF_LOG_LEVEL: 'warn',
         },
       },
       ready: {
-        display: 'Grafana', // If null, the health check will NOT be displayed to the user. If provided, this string will be the name of the health check and displayed to the user.
-        // The function below determines the health status of the daemon.
+        display: 'Grafana',
+        // Grafana migrates its database on first start after an upgrade.
         gracePeriod: 60000,
         fn: () =>
-          sdk.healthCheck.checkWebUrl(effects, 'http://127.0.0.1:' + uiPort, {
+          sdk.healthCheck.checkWebUrl(effects, `http://127.0.0.1:${uiPort}`, {
             successMessage: i18n('Grafana is ready'),
             errorMessage: i18n('Grafana is unreachable'),
           }),
       },
-      requires: ['prometheus', 'json-exporter'],
+      requires: ['grafana-setup', 'prometheus', 'json-exporter'],
     })
 })
