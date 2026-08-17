@@ -1,31 +1,52 @@
-# AxeOS Monitor Instructions
+# AxeOS Monitor
 
-AxeOS Monitor bundles Grafana, Prometheus, and JSON Exporter into a single service for monitoring AxeOS (ESP-Miner) Bitaxe miners. A pre-configured Grafana dashboard is included. No manual Grafana setup is needed.
+Your miners need fixed IP addresses. AxeOS Monitor finds them by address, so reserve one per miner on your router before you start — if an address changes later, that miner's history starts over under the new one.
 
-## First-time setup
+## Documentation
 
-1. Open **Configure AxeOS Monitor** and enter the IP addresses of your Bitaxe miners (one per entry), select your AxeOS version, and save.
-2. The service will start collecting metrics immediately.
-3. Open the **Grafana Dashboard** interface. You will be prompted to create an account on first visit.
+- [Grafana documentation](https://grafana.com/docs/grafana/latest/) — building dashboards, panels and alerts.
+- [PromQL basics](https://prometheus.io/docs/prometheus/latest/querying/basics/) — the query language behind every panel.
+- [AxeOS (ESP-Miner)](https://github.com/bitaxeorg/ESP-Miner) — the miner firmware whose status API is read.
 
-## Adding or removing miners
+## What you get on StartOS
 
-Run **Configure AxeOS Monitor** at any time to add or remove IP addresses. Changes take effect immediately without restarting.
+- **A Grafana dashboard** showing hashrate, temperature, power draw, fan speed and share statistics for every miner you list, updated continuously.
+- **A metrics database** that keeps the history, so you can look back at last night as easily as at right now.
+- **The raw Prometheus interface**, for writing your own queries or pointing other tools at the data.
 
-If you create a Grafana admin account and forget its password, use **Reset Admin Password**.
+## Getting set up
 
-## Customize the default Dashboard
+1. Open **Configure AxeOS Monitor**. It is waiting for you the moment the service is installed, and nothing else will run until it is done.
+2. Add the IP address of each miner, one entry each. You can find a miner's address on its own screen or in your router's client list.
+3. Choose the AxeOS version your miners run. Each miner shows its firmware version on its own web page; pick the option that covers it, or the newest one if none does.
+4. Leave the scrape interval at 15 seconds unless you have a reason to change it. Shorter means more detail and a larger database.
+5. Save, then start the service. Collection begins as soon as it is running.
+6. Open the **Grafana Dashboard** interface and sign in with the username `admin` and the password `admin`.
+7. Change that password straight away — it is the same on every Grafana install, and this address is reachable by anyone on your network. Use **Reset Admin Password**, or Grafana's own profile page.
 
-AxeOS Monitor comes with a default dashboard that already has some useful widgets. You can customize this dashboard by adding or removing widgets, or by creating your own custom widgets.
+The AxeOS dashboard opens automatically once you are signed in.
 
-Note that the default dashboard cannot be saved and serves as a template for creating your own dashboards. This default dashboard will be reset and overwritten when you upgrade or reinstall AxeOS Monitor.
+## Using AxeOS Monitor
 
-If you want to customize the default dashboard, you should save it as a new dashboard. To do this, click on the "Edit" button in the top right corner of the dashboard, then "Save as copy". You will be prompted to enter a name for your new dashboard. Once you have saved your new dashboard, you can customize it as you like.
+### Adding or removing miners
 
-## Set your home dashboard
+Run **Configure AxeOS Monitor** again at any time. The form comes back filled in with what you set last, so you can add an address, drop one, or change the interval and save. Changes take effect right away — the only setting that restarts the service is the AxeOS version.
 
-To set your newly copied dashboard as your default home dashboard, go to your profile (click the icon in the top right of the screen). Here you can select your new dashboard from the "Home Dashboard" dropdown menu. This will set your new dashboard as the default dashboard that is displayed when you log in.
+### Making the dashboard your own
 
-## Prometheus
+The AxeOS dashboard is a starting point, and it is replaced every time the service starts — including on updates — so edits to it will not stick. To keep your changes, open the dashboard, click **Edit**, then **Save as copy**, and give it a name. Your copy is yours and is never overwritten.
 
-The **Prometheus** interface exposes raw metrics. This is intended for advanced use or integration with other tools.
+To open your copy by default, click your profile icon in the top right and pick it from the **Home Dashboard** list.
+
+### If you lose your Grafana password
+
+Run **Reset Admin Password**, choose a new one, and it returns the username and password to sign in with.
+
+### Raw metrics
+
+The **Prometheus** interface exposes the metrics database directly, for your own queries or for other tools. It has no password of its own — anyone who can reach the address can read it, so publish it accordingly.
+
+## Limitations
+
+- Only the AxeOS versions offered in the Configure form are supported. A miner on a newer release is still read, but panels for any field the firmware moved will show "No data".
+- Miners are identified by IPv4 address. Hostnames and IPv6 addresses are not accepted.
