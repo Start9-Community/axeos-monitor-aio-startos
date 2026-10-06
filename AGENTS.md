@@ -18,15 +18,23 @@ Freshly scaffolded? Work the
 guide page, not a file in this repo — read it, don't copy it in.
 
 Keep `README.md` (technical reference for an AI support or administering agent) and
-`instructions.md` (end-user docs) in sync with your changes.
+`instructions.md` (end-user docs) in sync with your changes. This file restates neither:
+whoever changes the package has both, so it carries only what they don't — repo mechanics,
+a change that looks right and is not, where the next thing gets added, a naming trap, a
+build or test invocation particular to this repo.
 
-**Bugs and feature requests are GitHub issues on this repo** — file them as you find them.
+**Fix a defect you spot rather than reporting it** — you have the package open and the
+context to be sure. File **a GitHub issue on this repo** only when the call isn't yours to
+make: you can't pin the cause down, two defensible fixes exist, or it's too large to ride on
+the work in hand. An open issue is a report, not a queue — implement one when you're asked
+to or when it's labelled `Approved`, then close it with `Closes #<n>`.
+
 Don't record work in the repo instead: no `TODO.md`, no `NOTES.md`, no `PLAN.md`. What you
 verified, tried, and decided belongs in the commit message and the PR body.
 
 ## This repo
 
 - **`upstreamRepo` names AxeOS (ESP-Miner), not any of the three images.** There is no single upstream project for this composition; AxeOS is what the package exists to monitor and what its versioned assets track. Don't repoint it at Grafana.
-- **The versioned assets track the AxeOS API, not the image versions.** `assets/json-exporter/config-<v>.yml` and `assets/grafana/dashboards/axeos-<v>.json` come in a pair per supported AxeOS release, and `axeosVersion` in `store.json` picks which pair is used. Adding support for a new AxeOS release means adding a matching pair, extending the `StoreShape` union in `startos/fileModels/store.json.ts`, and adding the option to the `axeosVersion` select in `startos/actions/config.ts` — all four, or the selection silently falls through to the default.
-- **`store.json` lives in the `prometheus` volume at `etc/prometheus/store.json`.** It is beside Prometheus's own config because that directory is the one already mounted; moving it would strand the version selection of existing installs without a migration.
-- **Grafana requires a login; nothing forces the default off.** Anonymous access is not enabled (verified: `/` 302s to `/login`, the API 401s without a session), and first sign-in is Grafana's shipped `admin` / `admin`, which authenticates as-is. Don't document it as open, don't claim a forced password change, and don't add `GF_AUTH_ANONYMOUS_*` without deciding that the Prometheus interface should be open too.
+- **Supporting a new AxeOS release takes four edits, not one.** Add the `assets/json-exporter/config-<v>.yml` and `assets/grafana/dashboards/axeos-<v>.json` pair, extend the `StoreShape` union in `startos/fileModels/store.json.ts`, and add the option to the `axeosVersion` select in `startos/actions/config.ts` — miss one and the selection silently falls through to the default.
+- **Don't move `store.json` out of `prometheus:etc/prometheus/` without a migration** — existing installs would lose their version selection.
+- **Don't add `GF_AUTH_ANONYMOUS_*`** without deciding that the Prometheus interface should be open too — Grafana's login is the only access control the package has.

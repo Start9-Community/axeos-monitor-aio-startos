@@ -1,25 +1,25 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-const shape = z.object({
-  global: z.object({
+const shape = z.looseObject({
+  global: z.looseObject({
     scrape_interval: z.string(),
   }),
   scrape_config_files: z.array(z.string()).optional(),
   scrape_configs: z.array(
-    z.object({
+    z.looseObject({
       job_name: z.string(),
       metrics_path: z.string(),
-      params: z.object({
+      params: z.looseObject({
         module: z.array(z.string()),
       }),
       static_configs: z.array(
-        z.object({
+        z.looseObject({
           targets: z.array(z.string()),
         }),
       ),
       relabel_configs: z.array(
-        z.object({
+        z.looseObject({
           source_labels: z.array(z.string()).optional(),
           regex: z.string().optional(),
           target_label: z.string(),
