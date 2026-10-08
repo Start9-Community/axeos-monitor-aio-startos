@@ -1,7 +1,7 @@
 import { config } from '../actions/config'
 import { actions } from '../actions'
 import { restoreInit } from '../backups'
-import { setDependencies } from '../dependencies'
+import { dependencies } from '../dependencies'
 import { axeosConfig } from '../fileModels/axeos.yml'
 import {
   defaultPrometheusConfig,
@@ -38,8 +38,8 @@ export const init = sdk.setupInit(
   restoreInit,
   versionGraph,
   setInterfaces,
-  setDependencies,
   actions,
+  dependencies,
   addConfigTask,
 )
 

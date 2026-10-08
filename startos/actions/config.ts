@@ -18,7 +18,7 @@ export const inputSpec = InputSpec.of({
       {
         name: i18n('Bitaxe IP Addresses'),
         description: i18n(
-          'IP address of each AxeOS/Bitaxe instance to monitor.',
+          "One entry per miner, as shown on its screen or in your router's client list. Reserve each address on your router: a miner whose address changes starts a new history.",
         ),
         minLength: 1,
       },
@@ -39,14 +39,16 @@ export const inputSpec = InputSpec.of({
   ),
   axeosVersion: Value.select({
     name: i18n('AxeOS (ESP-Miner) Version'),
-    description: i18n('The version of AxeOS (ESP-Miner) you are running.'),
+    description: i18n(
+      "Picks the dashboard and metrics that match your miners' firmware. Each miner shows its AxeOS version on its own web page. Changing this restarts the service.\n- >= 2.11.x: miners on AxeOS 2.11 or newer\n- <= 2.10.x: miners on AxeOS 2.10 or older",
+    ),
     default: '2.11',
     values: { '2.11': '>= 2.11.x', '2.10': '<= 2.10.x' },
   }),
   scrape_interval: Value.number({
     name: i18n('Scrape Interval'),
     description: i18n(
-      'How often to scrape for metrics. Default is 15 seconds.',
+      'Shorter intervals record more detail and grow the database faster.',
     ),
     required: true,
     default: 15,
@@ -67,7 +69,9 @@ export const config = sdk.Action.withInput(
   // metadata
   async ({ effects }) => ({
     name: i18n('Configure AxeOS Monitor'),
-    description: i18n('Configure AxeOS Monitor settings'),
+    description: i18n(
+      'Choose the miners to monitor, the AxeOS version they run, and how often to read them.',
+    ),
     warning: null,
     allowedStatuses: 'any',
     group: null,

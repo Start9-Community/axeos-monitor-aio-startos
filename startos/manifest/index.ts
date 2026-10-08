@@ -15,18 +15,14 @@ export const manifest = setupManifest({
     grafana: {
       source: { dockerTag: 'grafana/grafana:12.4.3' },
       arch: ['x86_64', 'aarch64'],
-      emulateMissingAs: 'aarch64',
     },
     prometheus: {
       source: { dockerTag: 'prom/prometheus:v3.11.2' },
       arch: ['x86_64', 'aarch64'],
-      emulateMissingAs: 'aarch64',
     },
     'json-exporter': {
       source: { dockerTag: 'prometheuscommunity/json-exporter:v0.7.0' },
       arch: ['x86_64', 'aarch64'],
-      emulateMissingAs: 'aarch64',
     },
   },
-  dependencies: {},
 })

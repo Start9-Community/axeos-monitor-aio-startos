@@ -47,7 +47,7 @@ Three unmodified upstream images run side by side, each in its own subcontainer,
 | `prometheus`    | `prom/prometheus`                   | Scrapes and stores the time series                  |
 | `json-exporter` | `prometheuscommunity/json-exporter` | Turns a miner's JSON status into Prometheus metrics |
 
-All three are built for x86_64 and aarch64, and declare `emulateMissingAs: 'aarch64'` so a platform without a native build runs the aarch64 image emulated.
+All three are built for x86_64 and aarch64; on a platform without a native build, StartOS runs an available image under emulation (`emulateMissing` is left at its default).
 
 Two oneshots run before the daemons and are the only things the package executes itself:
 
@@ -187,7 +187,7 @@ package_id: axeos-monitor-aio
 image: grafana/grafana # plus prom/prometheus and prometheuscommunity/json-exporter
 architectures:
   - x86_64
-  - aarch64 # emulateMissingAs: aarch64, so other platforms run this emulated
+  - aarch64 # other platforms run an available image emulated
 subcontainers:
   - grafana
   - prometheus

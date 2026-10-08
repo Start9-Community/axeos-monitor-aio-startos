@@ -17,13 +17,13 @@ const dict = {
 
   // actions/config.ts
   'Bitaxe IP Addresses': 200,
-  'IP address of each AxeOS/Bitaxe instance to monitor.': 201,
+  "One entry per miner, as shown on its screen or in your router's client list. Reserve each address on your router: a miner whose address changes starts a new history.": 201,
   'AxeOS (ESP-Miner) Version': 202,
-  'The version of AxeOS (ESP-Miner) you are running.': 203,
+  "Picks the dashboard and metrics that match your miners' firmware. Each miner shows its AxeOS version on its own web page. Changing this restarts the service.\n- >= 2.11.x: miners on AxeOS 2.11 or newer\n- <= 2.10.x: miners on AxeOS 2.10 or older": 203,
   'Scrape Interval': 204,
-  'How often to scrape for metrics. Default is 15 seconds.': 205,
+  'Shorter intervals record more detail and grow the database faster.': 205,
   'Configure AxeOS Monitor': 206,
-  'Configure AxeOS Monitor settings': 207,
+  'Choose the miners to monitor, the AxeOS version they run, and how often to read them.': 207,
   'Must be a valid IPv4 address (e.g. 192.168.1.100)': 208,
   'Configuration Saved': 209,
   'The service is restarting to load the dashboard for the selected AxeOS version.': 210,
